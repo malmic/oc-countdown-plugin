@@ -1,9 +1,11 @@
 <?php namespace Rebel59\Countdown\Components;
 
 use Cms\Classes\ComponentBase;
+use Illuminate\Support\Facades\Log;
 
 class Countdown extends ComponentBase
 {
+    public $date;
 
     public function componentDetails()
     {
@@ -16,6 +18,10 @@ class Countdown extends ComponentBase
     public function defineProperties()
     {
         return [
+            'countdown_id' => [
+                'default' => 'countdown',
+                'type' => 'string',
+            ],
             'date' => [
                 'title'             => 'rebel59.countdown::lang.components.countdown.properties.date.title',
                 'description'       => 'rebel59.countdown::lang.components.countdown.properties.date.description',
@@ -54,8 +60,15 @@ class Countdown extends ComponentBase
 
     public function onRender(){
         $this->loadAssets();
+        $this->page['countdown_id'] = $this->property('countdown_id');
     }
 
+    public function onRun()
+    {
+        $this->page['countdown_id'] = $this->property('countdown_id');
+        $this->page['countdown_date'] = $this->property('countdown_date');
+    }
+    
     protected function loadAssets(){
         if(!$this->property('date')){
             $this->page['error'] = true;
@@ -65,9 +78,6 @@ class Countdown extends ComponentBase
         if($this->property('css'))
             $this->addCss('/plugins/rebel59/countdown/assets/dist/app.countdown.min.css');
 
-        if($this->property('jquery'))
-            $this->addJs('/plugins/rebel59/countdown/assets/dist/vendor/jquery/jquery.3.2.0.production.js');
-
         if($this->property('countdown'))
             $this->addJs('/plugins/rebel59/countdown/assets/dist/vendor/countdown/jquery.countdown.min.js');
 
@@ -76,7 +86,8 @@ class Countdown extends ComponentBase
     }
 
     public function onCountdownDate(){
-        return ['date' => $this->property('date')];
+        $date = $this->property('date');
+        return ['date' => $date];
     }
 
 }
