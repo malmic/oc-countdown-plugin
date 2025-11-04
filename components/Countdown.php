@@ -2,6 +2,7 @@
 
 use Cms\Classes\ComponentBase;
 use Illuminate\Support\Facades\Log;
+use Seimaldigital\Bikestats\Components\Stats;
 
 class Countdown extends ComponentBase
 {
@@ -68,7 +69,7 @@ class Countdown extends ComponentBase
         $this->page['countdown_id'] = $this->property('countdown_id');
         $this->page['countdown_date'] = $this->property('countdown_date');
     }
-    
+
     protected function loadAssets(){
         if(!$this->property('date')){
             $this->page['error'] = true;
@@ -86,7 +87,14 @@ class Countdown extends ComponentBase
     }
 
     public function onCountdownDate(){
-        $date = $this->property('date');
+        $date = $this->property('date'); // fallback
+
+        if(!$date) {
+            $stats = new Stats();
+            $statistics = $stats->getHelperArray($stats->getStatistics());
+            $date = optional($statistics['settings'])->countdown_date;
+        }
+
         return ['date' => $date];
     }
 
